@@ -1,7 +1,10 @@
 <?php
 /**
  * @file
+ * Hook implementations and callbacks for the github_stats module.
  */
+
+define('GITHUB_STATS_USERAGENT', 'Mozilla/5.0 (Backdrop CMS stats; +https://github.com/backdrop-contrib/github_stats');
 
 /**
  * Implements hook_entity_info().
@@ -172,7 +175,7 @@ function _github_stats_fetch_repo_info($github_path, $silent = TRUE) {
   $options = array(
     CURLOPT_TIMEOUT => 3,
     CURLOPT_HTTPHEADER => array('Accept: application/vnd.github.v3+json'),
-    CURLOPT_USERAGENT => 'Mozilla/5.0 (Backdrop CMS stats; +https://backdropcms.org/)',
+    CURLOPT_USERAGENT => GITHUB_STATS_USERAGENT,
     CURLOPT_RETURNTRANSFER => TRUE,
   );
   $handle = curl_init($url);
@@ -209,7 +212,7 @@ function _github_stats_fetch_releases_info($github_path, $silent = TRUE) {
   $options = array(
     CURLOPT_TIMEOUT => 3,
     CURLOPT_HTTPHEADER => array('Accept: application/vnd.github.v3+json'),
-    CURLOPT_USERAGENT => 'Mozilla/5.0 (Backdrop CMS stats; +https://backdropcms.org/)',
+    CURLOPT_USERAGENT => GITHUB_STATS_USERAGENT,
     CURLOPT_RETURNTRANSFER => TRUE,
   );
   $handle = curl_init($url);
@@ -242,6 +245,7 @@ function _github_stats_borg_usage_count($project_name) {
   $num = 0;
   $url = 'https://backdropcms.org/project/' . $project_name;
   $handle = curl_init($url);
+  curl_setopt($handle, CURLOPT_USERAGENT, GITHUB_STATS_USERAGENT);
   curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
   $output = curl_exec($handle);
   curl_close($handle);
