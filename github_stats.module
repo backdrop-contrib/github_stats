@@ -133,10 +133,27 @@ function github_stats_menu() {
   return $items;
 }
 
+/**
+ * Item loader function for hook_menu().
+ *
+ * @param string $id
+ *   The item id from URL.
+ *
+ * @return GithubProject|FALSE
+ */
 function github_project_id_load($id) {
   return entity_load('github_project', $id);
 }
 
+/**
+ * Render a page with a single github_project entity.
+ *
+ * @param GithubProject $project
+ *   GithubProject.
+ *
+ * @return array
+ *   Renderable array.
+ */
 function github_stats_item_page(GithubProject $project) {
   backdrop_set_title($project->label());
   $project->buildContent();
@@ -188,7 +205,7 @@ function _github_stats_fetch_releases_info($github_path, $silent = TRUE) {
   // parsing headers from Github API's cumbersome, prone to errors and they'll
   // probably change the API before any contrib reaches 100 releases.
   $params = array('per_page' => '100');
-  $url = 'https://api.github.com/repos/' . $github_path . '/releases' . '?' . http_build_query($params);
+  $url = 'https://api.github.com/repos/' . $github_path . '/releases?' . http_build_query($params);
   $options = array(
     CURLOPT_TIMEOUT => 3,
     CURLOPT_HTTPHEADER => array('Accept: application/vnd.github.v3+json'),

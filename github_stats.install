@@ -1,8 +1,12 @@
 <?php
 /**
  * @file
+ * Hooks releated to installation for github_stats module.
  */
 
+/**
+ * Implements hook_schema().
+ */
 function github_stats_schema() {
   $schema['github_stats'] = array(
     'description' => 'The base table for github stats.',

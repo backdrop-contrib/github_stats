@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Expose data from github_stats to views.
+ */
 
 /**
  * Implements hook_views_data().
@@ -16,7 +20,7 @@ function github_stats_views_data() {
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
-     ),
+    ),
     'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
@@ -95,7 +99,7 @@ function github_stats_views_data() {
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
-     ),
+    ),
     'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
@@ -109,7 +113,7 @@ function github_stats_views_data() {
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
-     ),
+    ),
     'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
@@ -137,7 +141,7 @@ function github_stats_views_data() {
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
-     ),
+    ),
     'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
@@ -151,7 +155,7 @@ function github_stats_views_data() {
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
-     ),
+    ),
     'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
