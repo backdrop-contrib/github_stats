@@ -1,8 +1,12 @@
 <?php
 /**
  * @file
+ * Admin form handling for github_stats module.
  */
 
+/**
+ * Form callback to create an item.
+ */
 function github_stats_project_create_form($form, &$form_state) {
   $form['name'] = array(
     '#type' => 'textfield',
@@ -20,11 +24,14 @@ function github_stats_project_create_form($form, &$form_state) {
   $form['actions']['#type'] = 'actions';
   $form['actions']['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Save and fetch data')
+    '#value' => t('Save and fetch data'),
   );
   return $form;
 }
 
+/**
+ * Validation callback for item creation.
+ */
 function github_stats_project_create_form_validate(&$form, &$form_state) {
   $github_path = $form_state['values']['github_path'];
   $exists = (bool) db_query('SELECT 1 FROM {github_stats} WHERE github_path = :path', array(
@@ -37,6 +44,9 @@ function github_stats_project_create_form_validate(&$form, &$form_state) {
   }
 }
 
+/**
+ * Submission callback for item creation.
+ */
 function github_stats_project_create_form_submit(&$form, &$form_state) {
   $entity = entity_create('github_project', array(
     'name' => $form_state['values']['name'],
@@ -59,6 +69,9 @@ function github_stats_project_create_form_submit(&$form, &$form_state) {
   }
 }
 
+/**
+ * Form callback to delete an item.
+ */
 function github_stats_project_delete_form($form, &$form_state, GithubProject $project) {
   $message = t('Are you sure you want to delete the record for %project? This action cannot be undone.', array(
     '%project' => $project->label(),
@@ -81,6 +94,9 @@ function github_stats_project_delete_form($form, &$form_state, GithubProject $pr
   return $form;
 }
 
+/**
+ * Submission callback to delete an item.
+ */
 function github_stats_project_delete_form_submit($form, &$form_state) {
   $name = $form['#entity']->label();
   $form['#entity']->delete();
@@ -90,6 +106,9 @@ function github_stats_project_delete_form_submit($form, &$form_state) {
   )));
 }
 
+/**
+ * Form callback to update an item.
+ */
 function github_stats_project_edit_form($form, &$form_state, GithubProject $project) {
   $project_label = $project->label();
   $project_id = $project->id();
@@ -122,7 +141,9 @@ function github_stats_project_edit_form($form, &$form_state, GithubProject $proj
     '#href' => "github-project/{$project_id}/delete",
     '#options' => array(
       'query' => isset($_GET['destination']) ? backdrop_get_destination() : array(),
-      'attributes' => array('class' => array('button', 'button-secondary', 'form-delete'))
+      'attributes' => array(
+        'class' => array('button', 'button-secondary', 'form-delete'),
+      ),
     ),
   );
   $form['actions']['cancel'] = array(
@@ -133,6 +154,9 @@ function github_stats_project_edit_form($form, &$form_state, GithubProject $proj
   return $form;
 }
 
+/**
+ * Submission callback to update an item.
+ */
 function github_stats_project_edit_form_submit($form, &$form_state) {
   $project = $form['#entity'];
   $id = $project->id();
