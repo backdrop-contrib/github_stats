@@ -1,0 +1,5 @@
+name = Github Statistics
+description = Grab info via GH API and store
+type = module
+backdrop = 1.x
+

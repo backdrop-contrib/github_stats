@@ -1,0 +1,292 @@
+<?php
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function github_stats_entity_info() {
+  $info = array(
+    'github_project' => array(
+      'label' => t('GitHub project'),
+      'entity class' => 'GithubProject',
+      'controller class' => 'GithubProjectStorageController',
+      'base table' => 'github_stats',
+      'fieldable' => FALSE,
+      'entity keys' => array(
+        'id' => 'id',
+      ),
+      'view modes' => array(
+        'full' => array(
+          'label' => t('Full object'),
+          'custom settings' => FALSE,
+        ),
+      ),
+    ),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function github_stats_autoload_info() {
+  return array(
+    'GithubProject' => 'github_stats.entity.inc',
+    'GithubProjectStorageController' => 'github_stats.entity.inc',
+  );
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function github_stats_views_api() {
+  return array(
+    'api' => 3,
+    'path' => backdrop_get_path('module', 'github_stats') . '/views',
+  );
+}
+
+/**
+ * Implements hook_permission().
+ */
+function github_stats_permission() {
+  return array(
+    'view github stats' => array(
+      'title' => t('View Github stats'),
+      'description' => t('View statistics fetched from Github.'),
+    ),
+    'administer github stats' => array(
+      'title' => t('Administer Github stats'),
+      'description' => t('Create, update and delete any project stats.'),
+      'restrict access' => TRUE,
+      'warning' => t('Allows creating, updating and deleting any project items.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_cron().
+ */
+function github_stats_cron() {
+  // Make sure this runs once per hour max.
+  $job_last_run = state_get('github_stats_job_last', 0);
+  $one_hour_passed = REQUEST_TIME - $job_last_run > 3600;
+  if (!$one_hour_passed) {
+    return;
+  }
+  state_set('github_stats_job_last', REQUEST_TIME);
+
+  // Override as desired in settings.php.
+  $expire_after = settings_get('github_stats_expire_after', 86400);
+  $max_per_cron = settings_get('github_stats_max_per_cron', 5);
+
+  $result = db_query_range('SELECT id FROM {github_stats} g WHERE g.last_fetched < :expires ORDER BY g.last_fetched ASC', 0, $max_per_cron, array(
+    ':expires' => time() - $expire_after,
+  ));
+  foreach ($result as $record) {
+    _github_stats_update_data($record->id);
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function github_stats_menu() {
+  $items['github-project/add'] = array(
+    'title' => 'Add Github repo',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('github_stats_project_create_form'),
+    'access arguments' => array('administer github stats'),
+    'file' => 'github_stats.admin.inc',
+  );
+  $items['github-project/%github_project_id'] = array(
+    'title' => 'Project',
+    'page callback' => 'github_stats_item_page',
+    'page arguments' => array(1),
+    'access arguments' => array('view github stats'),
+  );
+  $items['github-project/%github_project_id/view'] = array(
+    'title' => 'View',
+    'page callback' => 'github_stats_item_page',
+    'page arguments' => array(1),
+    'access arguments' => array('view github stats'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['github-project/%github_project_id/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('github_stats_project_edit_form', 1),
+    'access arguments' => array('administer github stats'),
+    'file' => 'github_stats.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+  );
+  $items['github-project/%github_project_id/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('github_stats_project_delete_form', 1),
+    'access arguments' => array('administer github stats'),
+    'file' => 'github_stats.admin.inc',
+  );
+  return $items;
+}
+
+function github_project_id_load($id) {
+  return entity_load('github_project', $id);
+}
+
+function github_stats_item_page(GithubProject $project) {
+  backdrop_set_title($project->label());
+  $project->buildContent();
+  return $project->content;
+}
+
+/**
+ * Custom callback to fetch JSON data related to repositories from Github.
+ *
+ * The rate limit for unauthenticated requests is 60 requests per hour per
+ * originating IP.
+ * @see https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api
+ */
+function _github_stats_fetch_repo_info($github_path, $silent = TRUE) {
+  $url = 'https://api.github.com/repos/' . $github_path;
+  $options = array(
+    CURLOPT_TIMEOUT => 3,
+    CURLOPT_HTTPHEADER => array('Accept: application/vnd.github.v3+json'),
+    CURLOPT_USERAGENT => 'Mozilla/5.0 (Backdrop CMS stats; +https://backdropcms.org/)',
+    CURLOPT_RETURNTRANSFER => TRUE,
+  );
+  $handle = curl_init($url);
+  foreach ($options as $key => $value) {
+    curl_setopt($handle, $key, $value);
+  }
+  $repo_info = curl_exec($handle);
+  $http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+  curl_close($handle);
+
+  if ($http_code == 200) {
+    return $repo_info;
+  }
+  if (!$silent) {
+    backdrop_set_message(t('Fetching repository info for project %github_path failed with HTTP code @code', array(
+      '%github_path' => $github_path,
+      '@code' => $http_code,
+    )), 'error');
+  }
+  return FALSE;
+}
+
+/**
+ * Custom callback to fetch JSON data related to releases from Github.
+ *
+ * @see https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api
+ */
+function _github_stats_fetch_releases_info($github_path, $silent = TRUE) {
+  // We only take care of 100 releases. No contrib project has that many, and
+  // parsing headers from Github API's cumbersome, prone to errors and they'll
+  // probably change the API before any contrib reaches 100 releases.
+  $params = array('per_page' => '100');
+  $url = 'https://api.github.com/repos/' . $github_path . '/releases' . '?' . http_build_query($params);
+  $options = array(
+    CURLOPT_TIMEOUT => 3,
+    CURLOPT_HTTPHEADER => array('Accept: application/vnd.github.v3+json'),
+    CURLOPT_USERAGENT => 'Mozilla/5.0 (Backdrop CMS stats; +https://backdropcms.org/)',
+    CURLOPT_RETURNTRANSFER => TRUE,
+  );
+  $handle = curl_init($url);
+  foreach ($options as $key => $value) {
+    curl_setopt($handle, $key, $value);
+  }
+  $release_info = curl_exec($handle);
+  $http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+  curl_close($handle);
+
+  if ($http_code == 200) {
+    return $release_info;
+  }
+  if (!$silent) {
+    backdrop_set_message(t('Fetching release info for project %github_path failed with HTTP code @code', array(
+      '%github_path' => $github_path,
+      '@code' => $http_code,
+    )), 'error');
+  }
+  return FALSE;
+}
+
+/**
+ * Callback to fetch usage stats from backdropcms.org.
+ *
+ * Parsing HTML may be prone to errors, but the project search (JSON) isn't
+ * particularly helpful to search by exact repo name.
+ */
+function _github_stats_borg_usage_count($project_name) {
+  $num = 0;
+  $url = 'https://backdropcms.org/project/' . $project_name;
+  $handle = curl_init($url);
+  curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
+  $output = curl_exec($handle);
+  curl_close($handle);
+
+  if ($output) {
+    libxml_use_internal_errors(TRUE);
+    $doc = new DOMDocument();
+    $success = $doc->loadHTML($output);
+    if ($success) {
+      $xpath = new DomXPath($doc);
+      $found = $xpath->query("//*[contains(@class, 'usage-total')]");
+      if (count($found)) {
+        $num = (int) $found->item(0)->textContent;
+      }
+    }
+    libxml_use_internal_errors(FALSE);
+  }
+  return $num;
+}
+
+/**
+ * Callback to fetch various data and update a github_project entity.
+ */
+function _github_stats_update_data($id, $silent = TRUE) {
+  $entity = entity_load('github_project', $id);
+  $github_path = $entity->github_path;
+
+  $repo_info = _github_stats_fetch_repo_info($github_path, $silent);
+  if ($repo_info && $data = json_decode($repo_info, TRUE)) {
+    $entity->repo_created = $data['created_at'];
+    $entity->default_branch = $data['default_branch'];
+    // GitHub's REST API considers every pull request an issue, so this number
+    // is acctually issues + pull requests, which is quite confusing.
+    // @see https://docs.github.com/de/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
+    $entity->open_issues_count = $data['open_issues_count'];
+    $entity->last_fetched = REQUEST_TIME;
+
+    $release_info = _github_stats_fetch_releases_info($github_path, $silent);
+    if ($release_info && $data = json_decode($release_info, TRUE)) {
+      $entity->release_count = count($data);
+      $entity->latest_release_date = $data[0]['published_at'];
+      $entity->latest_release_tag = $data[0]['tag_name'];
+      $download_count = 0;
+      foreach ($data as $index => $values) {
+        if ($values['assets'][0]) {
+          $download_count += $values['assets'][0]['download_count'];
+        }
+      }
+      $entity->download_count = $download_count;
+
+      // If we have releases, we might also have usage stats on backdropcms.org.
+      if ($entity->release_count && strpos($github_path, 'backdrop-contrib/') === 0) {
+        $replace = 1;
+        $project_name = str_replace('backdrop-contrib/', '', $github_path, $replace);
+        $borg_usage_count = _github_stats_borg_usage_count($project_name);
+        if ($borg_usage_count) {
+          $entity->borg_usage_count = $borg_usage_count;
+        }
+      }
+    }
+    $entity->save();
+    return TRUE;
+  }
+  return FALSE;
+}

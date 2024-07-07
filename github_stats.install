@@ -1,0 +1,123 @@
+<?php
+/**
+ * @file
+ */
+
+function github_stats_schema() {
+  $schema['github_stats'] = array(
+    'description' => 'The base table for github stats.',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique project ID.',
+      ),
+      'github_path' => array(
+        'description' => 'Path on GitHub, unique.',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'name' => array(
+        'description' => 'Human readable name of the project.',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'repo_created' => array(
+        'description' => 'The ISO datetime this repo has been created.',
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'default_branch' => array(
+        'description' => 'The default branch for this repo.',
+        'type' => 'varchar',
+        'length' => 15,
+        'not null' => TRUE,
+        'default' => '1.x-1.x',
+      ),
+      'open_issues_count' => array(
+        'description' => 'The number of currently open issues.',
+        'type' => 'int',
+        'size' => 'small',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
+      ),
+      'release_count' => array(
+        'description' => 'The number of releases for this project.',
+        'type' => 'int',
+        'size' => 'small',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
+      ),
+      'latest_release_date' => array(
+        'description' => 'The ISO datetime of the latest release.',
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => FALSE,
+        'default' => '',
+      ),
+      'latest_release_tag' => array(
+        'description' => 'The git tag of the latest release.',
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => FALSE,
+        'default' => NULL,
+      ),
+      'download_count' => array(
+        'description' => 'Overall zip release download count for this project.',
+        'type' => 'int',
+        'size' => 'medium',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => 0,
+      ),
+      'borg_usage_count' => array(
+        'description' => 'Usage count from backdropcms.org for this project.',
+        'type' => 'int',
+        'size' => 'medium',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => NULL,
+      ),
+      'last_fetched' => array(
+        'description' => 'The Unix timestamp when info has been fetched last time.',
+        'type' => 'int',
+        'size' => 'big',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('id'),
+    'unique keys' => array(
+      'github_path' => array('github_path'),
+    ),
+    'indexes' => array(
+      'last_fetched' => array('last_fetched'),
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function github_stats_uninstall() {
+  state_del('github_stats_job_last');
+  // Without the "github_stats" table this view is pointless.
+  $views_config = config('views.view.github_stats_overview');
+  $views_config->delete();
+  // Also take care of the stale menu item, that shipped with the view.
+  db_delete('menu_links')
+    ->condition('link_path', 'github-project/list')
+    ->condition('module', 'system')
+    ->execute();
+  menu_cache_clear('management');
+  cache('admin_bar')->flush();
+}
