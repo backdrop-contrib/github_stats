@@ -103,6 +103,7 @@ class GithubProjectStorageController extends EntityDatabaseStorageController {
     foreach ($properties as $key => $value_raw) {
       switch ($key) {
         case 'is_active_revision':
+        case 'entity_view_prepared':
           continue 2;
 
         case 'repo_created':
