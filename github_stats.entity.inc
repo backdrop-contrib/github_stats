@@ -89,10 +89,18 @@ class GithubProjectStorageController extends EntityDatabaseStorageController {
 
   /**
    * Overrides EntityDatabaseStorageController::buildContent().
+   *
+   * @param GithubProject $project
+   *   The GithubProject.
+   * @param string $view_mode
+   *   Not used in this entity type.
+   * @param string|null $langcode
+   *   Not used in this entity type.
    */
-  public function buildContent($project, $view_mode = 'full', $langcode = NULL) {
+  public function buildContent($project, $view_mode = 'full', $langcode = NULL) {// phpcs:ignore
     $items = array();
-    foreach ($project as $key => $value_raw) {
+    $properties = get_object_vars($project);
+    foreach ($properties as $key => $value_raw) {
       switch ($key) {
         case 'is_active_revision':
           continue 2;
