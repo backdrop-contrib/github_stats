@@ -137,6 +137,14 @@ function github_stats_menu() {
 }
 
 /**
+ * Implements hook_menu_alter().
+ */
+function github_stats_menu_alter(&$items) {
+  // Add a nice Phosphor icon to the menu item.
+  $items['github-project/list']['icon'] = 'chart-bar-fill';
+}
+
+/**
  * Item loader function for hook_menu().
  *
  * @param string $id
