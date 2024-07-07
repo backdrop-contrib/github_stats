@@ -4,7 +4,7 @@
  * Hook implementations and callbacks for the github_stats module.
  */
 
-define('GITHUB_STATS_USERAGENT', 'Mozilla/5.0 (Backdrop CMS stats; +https://github.com/backdrop-contrib/github_stats');
+define('GITHUB_STATS_USERAGENT', 'Mozilla/5.0 (Backdrop CMS stats; +https://github.com/backdrop-contrib/github_stats)');
 
 /**
  * Implements hook_entity_info().
