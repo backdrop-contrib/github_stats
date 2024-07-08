@@ -11,10 +11,10 @@ on those.
 So this module's probably only useful for a handful of people. It provides
 no value for BackdropCMS users or admins.
 
-Add projects via github-project/add, you have to add the project name and
-the Github path. The rest gets fetched automatically.
+**Add projects via form on github-project/add**, you have to add the project
+name and the Github path. The rest gets fetched automatically.
 
-There's an overview table on github-project/list.
+There's an overview table on **github-project/list**.
 
 Permissions aren't very fine grained. Adapt as needed on
 admin/config/people/permissions#module-github_stats.
