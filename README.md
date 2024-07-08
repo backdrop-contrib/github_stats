@@ -19,8 +19,7 @@ There's an overview table on **github-project/list**.
 Permissions aren't very fine grained. Adapt as needed on
 admin/config/people/permissions#module-github_stats.
 
-A cron job will keep infos up to date. There's no admin interface for
-tweaks, but some modification's possible via settings.php.
+A cron job will keep infos up to date, make sure cron runs regularly.
 
 ## Optional settings
 
