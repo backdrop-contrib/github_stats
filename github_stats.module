@@ -185,6 +185,9 @@ function _github_stats_fetch_repo_info($github_path, $silent = TRUE) {
     CURLOPT_USERAGENT => GITHUB_STATS_USERAGENT,
     CURLOPT_RETURNTRANSFER => TRUE,
   );
+  if ($api_token = settings_get('github_stats_api_token')) {
+    $options[CURLOPT_HTTPHEADER][] = "Authorization: token $api_token";
+  }
   $handle = curl_init($url);
   foreach ($options as $key => $value) {
     curl_setopt($handle, $key, $value);
@@ -222,6 +225,9 @@ function _github_stats_fetch_releases_info($github_path, $silent = TRUE) {
     CURLOPT_USERAGENT => GITHUB_STATS_USERAGENT,
     CURLOPT_RETURNTRANSFER => TRUE,
   );
+  if ($api_token = settings_get('github_stats_api_token')) {
+    $options[CURLOPT_HTTPHEADER][] = "Authorization: token $api_token";
+  }
   $handle = curl_init($url);
   foreach ($options as $key => $value) {
     curl_setopt($handle, $key, $value);
