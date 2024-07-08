@@ -37,7 +37,7 @@ $settings['github_stats_api_token'] = '';
 - *github_stats_max_per_cron*: The maximum number of items to fetch per cron run.
   Defaults to 5.
 - *github_stats_api_token*: The Github API token to use for fetching (to get
-  a much higher rate limit. If no token is set, the public API will be used.
+  a much higher rate limit). If no token is set, the public API will be used.
 
 ## Installation
 
