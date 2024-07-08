@@ -22,6 +22,23 @@ admin/config/people/permissions#module-github_stats.
 A cron job will keep infos up to date. There's no admin interface for
 tweaks, but some modification's possible via settings.php.
 
+## Optional settings
+
+There's no admin UI for settings, but some options are available via
+settings.php (or settings.local.php):
+
+```
+$settings['github_stats_expire_after'] = 86400;
+$settings['github_stats_max_per_cron'] = 5;
+$settings['github_stats_api_token'] = '';
+```
+- github_stats_expire_after: the number of seconds after which fresh
+  information should get fetched via cron. Defaults to one day.
+- github_stats_max_per_cron: The maximum number of items to fetch per cron run.
+  Defaults to 5.
+- github_stats_api_token: The Github API tokenn to use for fetching (to get
+  a much higher rate limit. If no token is set, the public API will be used.
+
 ## Installation
 
 - Install this module using the official [Backdrop CMS instructions](https://docs.backdropcms.org/documentation/extend-with-modules)
