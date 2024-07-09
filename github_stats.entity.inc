@@ -47,6 +47,7 @@ class GithubProject extends Entity {
   public function uri() {
     return array(
       'path' => 'github-project/' . $this->id,
+      'options' => array(),
     );
   }
 
