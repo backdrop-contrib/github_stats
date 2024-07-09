@@ -199,11 +199,18 @@ function _github_stats_fetch_repo_info($github_path, $silent = TRUE) {
   if ($http_code == 200) {
     return $repo_info;
   }
+  // Something's wrong with this repo that needs attention.
   if (!$silent) {
     backdrop_set_message(t('Fetching repository info for project %github_path failed with HTTP code @code', array(
       '%github_path' => $github_path,
       '@code' => $http_code,
     )), 'error');
+  }
+  else {
+    watchdog('github_stats', 'Fetching repository info for project %github_path failed with HTTP code @code', array(
+      '%github_path' => $github_path,
+      '@code' => $http_code,
+    ), WATCHDOG_WARNING);
   }
   return FALSE;
 }
