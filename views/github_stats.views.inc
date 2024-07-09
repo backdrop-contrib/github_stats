@@ -16,7 +16,7 @@ function github_stats_views_data() {
   );
   $data['github_stats']['id'] = array(
     'title' => t('ID'),
-    'help' => t('Record ID for this repo record.'),
+    'help' => t('Serial ID for this project record.'),
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
@@ -30,7 +30,7 @@ function github_stats_views_data() {
   );
   $data['github_stats']['github_path'] = array(
     'title' => t('Github path'),
-    'help' => t('Path of the repo on Github.'),
+    'help' => t('Path of the repository on github.com.'),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -47,7 +47,7 @@ function github_stats_views_data() {
   );
   $data['github_stats']['name'] = array(
     'title' => t('Project name'),
-    'help' => t('Human readable name of the repo.'),
+    'help' => t('Name or label for this repository.'),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -78,7 +78,7 @@ function github_stats_views_data() {
   );
   $data['github_stats']['default_branch'] = array(
     'title' => t('Default branch'),
-    'help' => t('Name of the default branch for this repo.'),
+    'help' => t('Name of the default branch for this repository.'),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -94,8 +94,8 @@ function github_stats_views_data() {
     ),
   );
   $data['github_stats']['open_issues_count'] = array(
-    'title' => t('Open issues'),
-    'help' => t('Number of open issues on Github.'),
+    'title' => t('Open issues and PR'),
+    'help' => t('Number of open issues and pull requests on Github.'),
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,

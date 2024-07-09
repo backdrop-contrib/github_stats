@@ -231,7 +231,7 @@
                         "relationship": "none",
                         "group_type": "group",
                         "ui_name": "",
-                        "label": "Open issues",
+                        "label": "Open issues and PR",
                         "exclude": 0,
                         "alter": {
                             "alter_text": 0,
