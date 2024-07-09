@@ -101,10 +101,13 @@ class GithubProjectStorageController extends EntityDatabaseStorageController {
   public function buildContent($project, $view_mode = 'full', $langcode = NULL) {// phpcs:ignore
     $items = array();
     $properties = get_object_vars($project);
+    // @todo This might need some stricter approach because of dynamic
+    // properties.
     foreach ($properties as $key => $value_raw) {
       switch ($key) {
         case 'is_active_revision':
         case 'entity_view_prepared':
+        case 'content':
           continue 2;
 
         case 'repo_created':
