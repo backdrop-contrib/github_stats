@@ -86,7 +86,7 @@ function github_stats_cron() {
   $max_per_cron = settings_get('github_stats_max_per_cron', 5);
 
   $result = db_query_range('SELECT id FROM {github_stats} g WHERE g.last_fetched < :expires ORDER BY g.last_fetched ASC', 0, $max_per_cron, array(
-    ':expires' => time() - $expire_after,
+    ':expires' => REQUEST_TIME - $expire_after,
   ));
   foreach ($result as $record) {
     _github_stats_update_data($record->id);
