@@ -160,7 +160,7 @@ function github_project_id_load($id) {
  * Render a page with a single github_project entity.
  *
  * @param GithubProject $project
- *   GithubProject.
+ *   GithubProject entity.
  *
  * @return array
  *   Renderable array.
@@ -173,9 +173,12 @@ function github_stats_item_page(GithubProject $project) {
 /**
  * Custom callback to fetch JSON data related to repositories from Github.
  *
- * The rate limit for unauthenticated requests is 60 requests per hour per
- * originating IP.
- * @see https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api
+ * @param string $github_path
+ *   The repo's path on github.com.
+ * @param bool $silent
+ *   Show a message in case of failure or just log to dblog.
+ *
+ * @return string|false
  */
 function _github_stats_fetch_repo_info($github_path, $silent = TRUE) {
   $url = 'https://api.github.com/repos/' . $github_path;
@@ -218,7 +221,12 @@ function _github_stats_fetch_repo_info($github_path, $silent = TRUE) {
 /**
  * Custom callback to fetch JSON data related to releases from Github.
  *
- * @see https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api
+ * @param string $github_path
+ *   The repo's path on github.com.
+ * @param bool $silent
+ *   Show a message in case of failure or not.
+ *
+ * @return string|false
  */
 function _github_stats_fetch_releases_info($github_path, $silent = TRUE) {
   // We only take care of 100 releases. No contrib project has that many, and
@@ -260,6 +268,11 @@ function _github_stats_fetch_releases_info($github_path, $silent = TRUE) {
  *
  * Parsing HTML may be prone to errors, but the project search (JSON) isn't
  * particularly helpful to search by exact repo name.
+ *
+ * @param string $project_name
+ *   Project name (repository name).
+ *
+ * @return int
  */
 function _github_stats_borg_usage_count($project_name) {
   $num = 0;
@@ -291,11 +304,15 @@ function _github_stats_borg_usage_count($project_name) {
  *
  * @param string|int $id
  *   Numeric entity id.
+ * @param bool $silent
+ *   Indicates whether a message should be shown in case of failure or not.
+ *
+ * @return bool
  */
 function _github_stats_update_data($id, $silent = TRUE) {
   $entity = entity_load('github_project', $id);
   if (!$entity) {
-    return;
+    return FALSE;
   }
   $github_path = $entity->github_path;
 
