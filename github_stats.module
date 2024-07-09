@@ -75,7 +75,7 @@ function github_stats_permission() {
 function github_stats_cron() {
   // Make sure this runs once per hour max.
   $job_last_run = state_get('github_stats_job_last', 0);
-  $one_hour_passed = REQUEST_TIME - $job_last_run > 3600;
+  $one_hour_passed = REQUEST_TIME - $job_last_run >= 3600;
   if (!$one_hour_passed) {
     return;
   }
