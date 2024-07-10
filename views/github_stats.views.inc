@@ -27,6 +27,9 @@ function github_stats_views_data() {
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
   );
   $data['github_stats']['github_path'] = array(
     'title' => t('Github path'),
@@ -40,9 +43,6 @@ function github_stats_views_data() {
     ),
     'filter' => array(
       'handler' => 'views_handler_filter_string',
-    ),
-    'argument' => array(
-      'handler' => 'views_handler_argument_string',
     ),
   );
   $data['github_stats']['name'] = array(
@@ -70,10 +70,10 @@ function github_stats_views_data() {
       'click sortable' => TRUE,
     ),
     'sort' => array(
-      'handler' => 'views_handler_sort_date',
+      'handler' => 'views_handler_sort',
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_date',
+      'handler' => 'views_handler_filter_string',
     ),
   );
   $data['github_stats']['default_branch'] = array(
@@ -129,10 +129,10 @@ function github_stats_views_data() {
       'click sortable' => TRUE,
     ),
     'sort' => array(
-      'handler' => 'views_handler_sort_date',
+      'handler' => 'views_handler_sort',
     ),
     'filter' => array(
-      'handler' => 'views_handler_filter_date',
+      'handler' => 'views_handler_filter_string',
     ),
   );
   $data['github_stats']['download_count'] = array(
