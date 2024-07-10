@@ -1,8 +1,8 @@
 parameters:
   level: 1
   scanDirectories:
-    - ../../core
-    - ../
+    - ../../../../core
+    - ../../
   fileExtensions:
     - php
     - module
