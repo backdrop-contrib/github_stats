@@ -101,14 +101,16 @@ class GithubProjectStorageController extends EntityDatabaseStorageController {
   public function buildContent($project, $view_mode = 'full', $langcode = NULL) {// phpcs:ignore
     $items = array();
     $properties = get_object_vars($project);
-    // @todo This might need some stricter approach because of dynamic
-    // properties.
+    // Filter out dynamic properties and prepare values for display.
     foreach ($properties as $key => $value_raw) {
       switch ($key) {
-        case 'is_active_revision':
-        case 'entity_view_prepared':
-        case 'content':
-          continue 2;
+        case 'id':
+        case 'open_issues_count':
+        case 'release_count':
+        case 'download_count':
+        case 'borg_usage_count':
+          $value = $value_raw;
+          break;
 
         case 'repo_created':
         case 'latest_release_date':
@@ -127,11 +129,13 @@ class GithubProjectStorageController extends EntityDatabaseStorageController {
 
         case 'github_path':
         case 'name':
+        case 'default_branch':
+        case 'latest_release_tag':
           $value = check_plain($value_raw);
           break;
 
         default:
-          $value = $value_raw;
+          continue 2;
       }
       $items[] = '<strong>' . $key . '</strong>: ' . $value;
     }
