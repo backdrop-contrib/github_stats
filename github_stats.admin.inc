@@ -16,10 +16,9 @@ function github_stats_project_create_form($form, &$form_state) {
   $form['github_path'] = array(
     '#type' => 'textfield',
     '#title' => t('Github path'),
+    '#default_value' => 'backdrop-contrib/',
+    '#description' => t("Enter a Github path in the form of 'org/repo'. For example, 'backdrop-contrib/example'.")
     '#required' => TRUE,
-    '#attributes' => array(
-      'placeholder' => 'backdrop-contrib/example',
-    ),
   );
   $form['actions']['#type'] = 'actions';
   $form['actions']['submit'] = array(
