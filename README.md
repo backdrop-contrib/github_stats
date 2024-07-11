@@ -54,6 +54,12 @@ Learn how to
 
 Bugs and feature requests should be reported in the [Issue Queue](https://github.com/backdrop-contrib/github_stats/issues)
 
+## Known issues
+
+The usage count fetched from backdropcms.org has a long delay. The number
+seems to get updated there once a week, but because of caching, the delay's
+probably rather two weeks or more.
+
 ## Current Maintainers
 
 - [Indigoxela](https://github.com/indigoxela)
