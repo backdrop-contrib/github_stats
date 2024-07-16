@@ -291,7 +291,8 @@ function _github_stats_borg_usage_count($project_name) {
       $xpath = new DomXPath($doc);
       $found = $xpath->query("//*[contains(@class, 'usage-total')]");
       if (count($found)) {
-        $num = (int) $found->item(0)->textContent;
+        $sanitized_number = filter_var($found->item(0)->textContent, FILTER_SANITIZE_NUMBER_INT);
+        $num = (int) $sanitized_number;
       }
     }
     libxml_use_internal_errors(FALSE);
@@ -333,7 +334,7 @@ function _github_stats_update_data($id, $silent = TRUE) {
       $entity->latest_release_tag = $data[0]['tag_name'];
       $download_count = 0;
       foreach ($data as $index => $values) {
-        if ($values['assets'][0]) {
+        if (!empty($values['assets'][0])) {
           $download_count += $values['assets'][0]['download_count'];
         }
       }
