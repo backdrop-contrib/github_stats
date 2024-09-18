@@ -38,6 +38,7 @@ function github_stats_autoload_info() {
   return array(
     'GithubProject' => 'github_stats.entity.inc',
     'GithubProjectStorageController' => 'github_stats.entity.inc',
+    'EntityReferenceSelectionHandlerGeneric_github_project' => 'github_stats.entityreference.inc',
   );
 }
 
