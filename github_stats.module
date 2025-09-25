@@ -10,6 +10,7 @@ define('GITHUB_STATS_USERAGENT', 'Mozilla/5.0 (Backdrop CMS stats; +https://gith
  * Implements hook_entity_info().
  */
 function github_stats_entity_info() {
+  //dummy commit
   $info = array(
     'github_project' => array(
       'label' => t('GitHub project'),
