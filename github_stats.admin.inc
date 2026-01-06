@@ -48,7 +48,9 @@ function github_stats_project_create_form_validate(&$form, &$form_state) {
   curl_setopt($handle, CURLOPT_NOBODY, TRUE);
   curl_exec($handle);
   $http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-  curl_close($handle);
+  if (version_compare(PHP_VERSION, '8.0') < 0) {
+    curl_close($handle);
+  }
   if ($http_code != '200') {
     form_error($form['github_path'], t('A repository with the URL %url does not exist on Github.', array(
       '%url' => $url,

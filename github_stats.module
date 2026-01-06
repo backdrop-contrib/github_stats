@@ -198,7 +198,9 @@ function _github_stats_fetch_repo_info($github_path, $silent = TRUE) {
   }
   $repo_info = curl_exec($handle);
   $http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-  curl_close($handle);
+  if (version_compare(PHP_VERSION, '8.0') < 0) {
+    curl_close($handle);
+  }
 
   if ($http_code == 200) {
     return $repo_info;
@@ -250,7 +252,9 @@ function _github_stats_fetch_releases_info($github_path, $silent = TRUE) {
   }
   $release_info = curl_exec($handle);
   $http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-  curl_close($handle);
+  if (version_compare(PHP_VERSION, '8.0') < 0) {
+    curl_close($handle);
+  }
 
   if ($http_code == 200) {
     return $release_info;
@@ -282,7 +286,9 @@ function _github_stats_borg_usage_count($project_name) {
   curl_setopt($handle, CURLOPT_USERAGENT, GITHUB_STATS_USERAGENT);
   curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
   $output = curl_exec($handle);
-  curl_close($handle);
+  if (version_compare(PHP_VERSION, '8.0') < 0) {
+    curl_close($handle);
+  }
 
   if ($output) {
     libxml_use_internal_errors(TRUE);
